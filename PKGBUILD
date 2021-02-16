@@ -26,7 +26,7 @@ fi
 ##                             y to enable  (stock default)
 ## 这里保持默认就好，我没有发现有什么独特的地方
 if [ -z ${use_numa+x} ]; then
-  use_numa=y
+  use_numa=n
 fi
 
 ## For performance you can disable FUNCTION_TRACER/GRAPH_TRACER. Limits debugging and analyzing of the kernel.
@@ -88,6 +88,7 @@ _srcname="linux-${pkgver}-xanmod${xanmod}"
 source=("https://cdn.kernel.org/pub/linux/kernel/v${_branch}/linux-${_major}.tar."{xz,sign}
         "https://github.com/xanmod/linux/releases/download/${pkgver}-xanmod${xanmod}/patch-${pkgver}-xanmod${xanmod}.xz"
         choose-gcc-optimization.sh
+        'sphinx-workaround.patch'
         '0002-UKSM.patch'
         '0003-Makefile.patch')
 validpgpkeys=(
@@ -105,6 +106,7 @@ sha256sums=('04f07b54f0d40adfab02ee6cbd2a942c96728d87c1ef9e120d0cb9ba3fe067b4'
             'b8bc4f6312bdc086c0fecd1cce1ab1ee12b7b4eff63f88239a65461d9ec5e91b'
             '9d49118bb60c0277ebac5aadd4938eb41561dd3d97c9422832e62d0ffc5c59df'
             'e840e41f0f91108f63fd6e085c93b02daa78729268bc31be7be7fb355203e38a'
+            '74339b8ad0ad99f08606c5de0dd3c38f502e29e5c6a78d6efbe656662edb8d73'
             '6ae9b0f994c8cea6ddbaaa570a2570d8489643b33b61c68090670c241a0cd3cc'
             'c032d5c58b72919da274d2f6c3370f4b538012bcb327ad38c6ccc989ff5b2ccf')
 
