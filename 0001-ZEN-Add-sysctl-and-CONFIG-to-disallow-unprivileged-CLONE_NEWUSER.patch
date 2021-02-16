@@ -1,58 +1,3 @@
-From 5ec2dd3a095442ec1a21d86042a4994f2ba24e63 Mon Sep 17 00:00:00 2001
-Message-Id: <5ec2dd3a095442ec1a21d86042a4994f2ba24e63.1512651251.git.jan.steffens@gmail.com>
-From: Serge Hallyn <serge.hallyn@canonical.com>
-Date: Fri, 31 May 2013 19:12:12 +0100
-Subject: [PATCH] add sysctl to disallow unprivileged CLONE_NEWUSER by default
-
-Signed-off-by: Serge Hallyn <serge.hallyn@ubuntu.com>
-[bwh: Remove unneeded binary sysctl bits]
-Signed-off-by: Daniel Micay <danielmicay@gmail.com>
----
- kernel/fork.c           | 15 +++++++++++++++
- kernel/sysctl.c         | 12 ++++++++++++
- kernel/user_namespace.c |  3 +++
- 3 files changed, 30 insertions(+)
-
-diff --git a/kernel/fork.c b/kernel/fork.c
-index 07cc743698d3668e..4011d68a8ff9305c 100644
---- a/kernel/fork.c
-+++ b/kernel/fork.c
-@@ -102,6 +102,11 @@
- 
- #define CREATE_TRACE_POINTS
- #include <trace/events/task.h>
-+#ifdef CONFIG_USER_NS
-+extern int unprivileged_userns_clone;
-+#else
-+#define unprivileged_userns_clone 0
-+#endif
- 
- /*
-  * Minimum number of threads to boot the kernel
-@@ -1555,6 +1560,10 @@ static __latent_entropy struct task_struct *copy_process(
- 	if ((clone_flags & (CLONE_NEWUSER|CLONE_FS)) == (CLONE_NEWUSER|CLONE_FS))
- 		return ERR_PTR(-EINVAL);
- 
-+	if ((clone_flags & CLONE_NEWUSER) && !unprivileged_userns_clone)
-+		if (!capable(CAP_SYS_ADMIN))
-+			return ERR_PTR(-EPERM);
-+
- 	/*
- 	 * Thread groups must share signals as well, and detached threads
- 	 * can only be started up within the thread group.
-@@ -2348,6 +2357,12 @@ SYSCALL_DEFINE1(unshare, unsigned long, unshare_flags)
- 	if (unshare_flags & CLONE_NEWNS)
- 		unshare_flags |= CLONE_FS;
- 
-+	if ((unshare_flags & CLONE_NEWUSER) && !unprivileged_userns_clone) {
-+		err = -EPERM;
-+		if (!capable(CAP_SYS_ADMIN))
-+			goto bad_unshare_out;
-+	}
-+
- 	err = check_unshare_flags(unshare_flags);
- 	if (err)
- 		goto bad_unshare_out;
 diff --git a/kernel/sysctl.c b/kernel/sysctl.c
 index b86520ed3fb60fbf..f7dab3760839f1a1 100644
 --- a/kernel/sysctl.c
@@ -99,17 +44,6 @@ index c490f1e4313b998a..dd03bd39d7bf194d 100644
  
 -- 
 2.15.1
-
-From b5202296055dd333db4425120d3f93ef4e6a0573 Mon Sep 17 00:00:00 2001
-From: "Jan Alexander Steffens (heftig)" <jan.steffens@gmail.com>
-Date: Thu, 7 Dec 2017 13:50:48 +0100
-Subject: ZEN: Add CONFIG for unprivileged_userns_clone
-
-This way our default behavior continues to match the vanilla kernel.
----
- init/Kconfig            | 16 ++++++++++++++++
- kernel/user_namespace.c |  4 ++++
- 2 files changed, 20 insertions(+)
 
 diff --git a/init/Kconfig b/init/Kconfig
 index 4592bf7997c0..f3df02990aff 100644
