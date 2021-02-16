@@ -1,45 +1,121 @@
-From 68005d101d389407ed3c69ad0e58d2bdf37e20ab Mon Sep 17 00:00:00 2001
-From: "Jan Alexander Steffens (heftig)" <jan.steffens@gmail.com>
-Date: Mon, 16 Sep 2019 04:53:20 +0200
-Subject: [PATCH 1/2] ZEN: Add sysctl and CONFIG to disallow unprivileged
- CLONE_NEWUSER
+From 5ec2dd3a095442ec1a21d86042a4994f2ba24e63 Mon Sep 17 00:00:00 2001
+Message-Id: <5ec2dd3a095442ec1a21d86042a4994f2ba24e63.1512651251.git.jan.steffens@gmail.com>
+From: Serge Hallyn <serge.hallyn@canonical.com>
+Date: Fri, 31 May 2013 19:12:12 +0100
+Subject: [PATCH] add sysctl to disallow unprivileged CLONE_NEWUSER by default
 
-Our default behavior continues to match the vanilla kernel.
+Signed-off-by: Serge Hallyn <serge.hallyn@ubuntu.com>
+[bwh: Remove unneeded binary sysctl bits]
+Signed-off-by: Daniel Micay <danielmicay@gmail.com>
 ---
- include/linux/user_namespace.h |  4 ++++
- init/Kconfig                   | 16 ++++++++++++++++
- kernel/fork.c                  | 14 ++++++++++++++
- kernel/sysctl.c                | 12 ++++++++++++
- kernel/user_namespace.c        |  7 +++++++
- 5 files changed, 53 insertions(+)
+ kernel/fork.c           | 15 +++++++++++++++
+ kernel/sysctl.c         | 12 ++++++++++++
+ kernel/user_namespace.c |  3 +++
+ 3 files changed, 30 insertions(+)
 
-diff --git a/include/linux/user_namespace.h b/include/linux/user_namespace.h
-index 64cf8eb..bd29529 100644
---- a/include/linux/user_namespace.h
-+++ b/include/linux/user_namespace.h
-@@ -105,6 +105,8 @@ void dec_ucount(struct ucounts *ucounts, enum ucount_type type);
+diff --git a/kernel/fork.c b/kernel/fork.c
+index 07cc743698d3668e..4011d68a8ff9305c 100644
+--- a/kernel/fork.c
++++ b/kernel/fork.c
+@@ -102,6 +102,11 @@
  
- #ifdef CONFIG_USER_NS
- 
+ #define CREATE_TRACE_POINTS
+ #include <trace/events/task.h>
++#ifdef CONFIG_USER_NS
 +extern int unprivileged_userns_clone;
-+
- static inline struct user_namespace *get_user_ns(struct user_namespace *ns)
- {
- 	if (ns)
-@@ -138,6 +140,8 @@ extern bool current_in_userns(const struct user_namespace *target_ns);
- struct ns_common *ns_get_owner(struct ns_common *ns);
- #else
- 
++#else
 +#define unprivileged_userns_clone 0
++#endif
+ 
+ /*
+  * Minimum number of threads to boot the kernel
+@@ -1555,6 +1560,10 @@ static __latent_entropy struct task_struct *copy_process(
+ 	if ((clone_flags & (CLONE_NEWUSER|CLONE_FS)) == (CLONE_NEWUSER|CLONE_FS))
+ 		return ERR_PTR(-EINVAL);
+ 
++	if ((clone_flags & CLONE_NEWUSER) && !unprivileged_userns_clone)
++		if (!capable(CAP_SYS_ADMIN))
++			return ERR_PTR(-EPERM);
 +
- static inline struct user_namespace *get_user_ns(struct user_namespace *ns)
- {
- 	return &init_user_ns;
+ 	/*
+ 	 * Thread groups must share signals as well, and detached threads
+ 	 * can only be started up within the thread group.
+@@ -2348,6 +2357,12 @@ SYSCALL_DEFINE1(unshare, unsigned long, unshare_flags)
+ 	if (unshare_flags & CLONE_NEWNS)
+ 		unshare_flags |= CLONE_FS;
+ 
++	if ((unshare_flags & CLONE_NEWUSER) && !unprivileged_userns_clone) {
++		err = -EPERM;
++		if (!capable(CAP_SYS_ADMIN))
++			goto bad_unshare_out;
++	}
++
+ 	err = check_unshare_flags(unshare_flags);
+ 	if (err)
+ 		goto bad_unshare_out;
+diff --git a/kernel/sysctl.c b/kernel/sysctl.c
+index b86520ed3fb60fbf..f7dab3760839f1a1 100644
+--- a/kernel/sysctl.c
++++ b/kernel/sysctl.c
+@@ -105,6 +105,9 @@ extern int core_uses_pid;
+ 
+ #if defined(CONFIG_SYSCTL)
+ 
++#ifdef CONFIG_USER_NS
++extern int unprivileged_userns_clone;
++#endif
+ /* Constants used for minimum and  maximum */
+ #ifdef CONFIG_LOCKUP_DETECTOR
+ static int sixty = 60;
+@@ -513,6 +516,15 @@ static struct ctl_table kern_table[] = {
+ 		.proc_handler	= proc_dointvec,
+ 	},
+ #endif
++#ifdef CONFIG_USER_NS
++	{
++		.procname	= "unprivileged_userns_clone",
++		.data		= &unprivileged_userns_clone,
++		.maxlen		= sizeof(int),
++		.mode		= 0644,
++		.proc_handler	= proc_dointvec,
++	},
++#endif
+ #ifdef CONFIG_PROC_SYSCTL
+ 	{
+ 		.procname	= "tainted",
+diff --git a/kernel/user_namespace.c b/kernel/user_namespace.c
+index c490f1e4313b998a..dd03bd39d7bf194d 100644
+--- a/kernel/user_namespace.c
++++ b/kernel/user_namespace.c
+@@ -24,6 +24,9 @@
+ #include <linux/projid.h>
+ #include <linux/fs_struct.h>
+ 
++/* sysctl */
++int unprivileged_userns_clone;
++
+ static struct kmem_cache *user_ns_cachep __read_mostly;
+ static DEFINE_MUTEX(userns_state_mutex);
+ 
+-- 
+2.15.1
+
+From b5202296055dd333db4425120d3f93ef4e6a0573 Mon Sep 17 00:00:00 2001
+From: "Jan Alexander Steffens (heftig)" <jan.steffens@gmail.com>
+Date: Thu, 7 Dec 2017 13:50:48 +0100
+Subject: ZEN: Add CONFIG for unprivileged_userns_clone
+
+This way our default behavior continues to match the vanilla kernel.
+---
+ init/Kconfig            | 16 ++++++++++++++++
+ kernel/user_namespace.c |  4 ++++
+ 2 files changed, 20 insertions(+)
+
 diff --git a/init/Kconfig b/init/Kconfig
-index 29ad683..96b79cf 100644
+index 4592bf7997c0..f3df02990aff 100644
 --- a/init/Kconfig
 +++ b/init/Kconfig
-@@ -1172,6 +1172,22 @@ config USER_NS
+@@ -1004,6 +1004,22 @@ config USER_NS
  
  	  If unsure, say N.
  
@@ -62,93 +138,19 @@ index 29ad683..96b79cf 100644
  config PID_NS
  	bool "PID Namespaces"
  	default y
-diff --git a/kernel/fork.c b/kernel/fork.c
-index ff215b3..91f43cf 100644
---- a/kernel/fork.c
-+++ b/kernel/fork.c
-@@ -97,6 +97,10 @@
- #include <linux/scs.h>
- #include <linux/io_uring.h>
- 
-+#ifdef CONFIG_USER_NS
-+#include <linux/user_namespace.h>
-+#endif
-+
- #include <asm/pgalloc.h>
- #include <linux/uaccess.h>
- #include <asm/mmu_context.h>
-@@ -1865,6 +1869,10 @@ static __latent_entropy struct task_struct *copy_process(
- 	if ((clone_flags & (CLONE_NEWUSER|CLONE_FS)) == (CLONE_NEWUSER|CLONE_FS))
- 		return ERR_PTR(-EINVAL);
- 
-+	if ((clone_flags & CLONE_NEWUSER) && !unprivileged_userns_clone)
-+		if (!capable(CAP_SYS_ADMIN))
-+			return ERR_PTR(-EPERM);
-+
- 	/*
- 	 * Thread groups must share signals as well, and detached threads
- 	 * can only be started up within the thread group.
-@@ -2934,6 +2942,12 @@ int ksys_unshare(unsigned long unshare_flags)
- 	if (unshare_flags & CLONE_NEWNS)
- 		unshare_flags |= CLONE_FS;
- 
-+	if ((unshare_flags & CLONE_NEWUSER) && !unprivileged_userns_clone) {
-+		err = -EPERM;
-+		if (!capable(CAP_SYS_ADMIN))
-+			goto bad_unshare_out;
-+	}
-+
- 	err = check_unshare_flags(unshare_flags);
- 	if (err)
- 		goto bad_unshare_out;
-diff --git a/kernel/sysctl.c b/kernel/sysctl.c
-index c9fbdd8..1fbf5d5 100644
---- a/kernel/sysctl.c
-+++ b/kernel/sysctl.c
-@@ -103,6 +103,9 @@
- #ifdef CONFIG_LOCKUP_DETECTOR
- #include <linux/nmi.h>
- #endif
-+#ifdef CONFIG_USER_NS
-+#include <linux/user_namespace.h>
-+#endif
- 
- #if defined(CONFIG_SYSCTL)
- 
-@@ -1902,6 +1905,15 @@ static struct ctl_table kern_table[] = {
- 		.proc_handler	= proc_dointvec,
- 	},
- #endif
-+#ifdef CONFIG_USER_NS
-+	{
-+		.procname	= "unprivileged_userns_clone",
-+		.data		= &unprivileged_userns_clone,
-+		.maxlen		= sizeof(int),
-+		.mode		= 0644,
-+		.proc_handler	= proc_dointvec,
-+	},
-+#endif
- #ifdef CONFIG_PROC_SYSCTL
- 	{
- 		.procname	= "tainted",
 diff --git a/kernel/user_namespace.c b/kernel/user_namespace.c
-index af61294..95c54da 100644
+index 6b9dbc257e34..107b17f0d528 100644
 --- a/kernel/user_namespace.c
 +++ b/kernel/user_namespace.c
-@@ -21,6 +21,13 @@
- #include <linux/bsearch.h>
+@@ -27,7 +27,11 @@
  #include <linux/sort.h>
  
-+/* sysctl */
+ /* sysctl */
 +#ifdef CONFIG_USER_NS_UNPRIVILEGED
 +int unprivileged_userns_clone = 1;
 +#else
-+int unprivileged_userns_clone;
+ int unprivileged_userns_clone;
 +#endif
-+
+ 
  static struct kmem_cache *user_ns_cachep __read_mostly;
  static DEFINE_MUTEX(userns_state_mutex);
- 
--- 
-2.30.1.457.gf011795891
-
