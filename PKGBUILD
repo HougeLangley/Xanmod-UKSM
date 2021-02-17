@@ -44,9 +44,9 @@ fi
 ## By the way, This is important for people who using Skype and Wechat UOS, if 'NO', these apps could using.
 ## 如果你使用 skype 或者 wechatUOS，请选择这个补丁
 ## 否则，软件无法启动
-if [ -z ${use_ns+x} ]; then
-  use_ns=y
-fi
+#if [ -z ${use_ns+x} ]; then
+#  use_ns=y
+#fi
 
 # Compile ONLY used modules to VASTLYreduce the number of modules built
 # and the build time.
@@ -154,10 +154,10 @@ prepare() {
     scripts/config --disable CONFIG_NUMA
   fi
 
-  if [ "$use_ns" = "n" ]; then
-    msg2 "Disabling CONFIG_USER_NS_UNPRIVILEGED"
-    scripts/config --disable CONFIG_USER_NS_UNPRIVILEGED
-  fi
+  #if [ "$use_ns" = "n" ]; then
+  #  msg2 "Disabling CONFIG_USER_NS_UNPRIVILEGED"
+  #  scripts/config --disable CONFIG_USER_NS_UNPRIVILEGED
+  #fi
 
   # Let's user choose microarchitecture optimization in GCC
   sh ${srcdir}/choose-gcc-optimization.sh $_microarchitecture
