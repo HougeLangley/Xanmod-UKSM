@@ -69,7 +69,7 @@ _makenconfig=y
 ### IMPORTANT: Do no edit below this line unless you know what you're doing
 
 pkgbase=linux-xanmod-uksm
-pkgver=5.11.2
+pkgver=5.11.3
 _major=5.11
 _branch=5.x
 xanmod=1
@@ -108,7 +108,7 @@ sha256sums=('04f07b54f0d40adfab02ee6cbd2a942c96728d87c1ef9e120d0cb9ba3fe067b4'
             'e840e41f0f91108f63fd6e085c93b02daa78729268bc31be7be7fb355203e38a'
             '74339b8ad0ad99f08606c5de0dd3c38f502e29e5c6a78d6efbe656662edb8d73'
             'f00a84fd382d63cd0d47d6fd8ef6c8608b1c83ff9d6dbdd32cb985898afbbf58'
-            'a8b3069953ce2719976aaec020fca20f9e3176a5ee98b05839a314ba1fa5a640')
+            '43ac13aacb0bec80ff75be99b24f5fc50d1a5003e44f8f796434a8887b0c37d9')
 
 export KBUILD_BUILD_HOST=${KBUILD_BUILD_HOST:-archlinux}
 export KBUILD_BUILD_USER=${KBUILD_BUILD_USER:-makepkg}
