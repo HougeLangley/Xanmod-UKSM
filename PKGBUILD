@@ -69,7 +69,7 @@ _makenconfig=y
 ### IMPORTANT: Do no edit below this line unless you know what you're doing
 
 pkgbase=linux-xanmod-uksm
-pkgver=5.11.6
+pkgver=5.11.7
 _major=5.11
 _branch=5.x
 xanmod=1
@@ -90,6 +90,7 @@ source=("https://cdn.kernel.org/pub/linux/kernel/v${_branch}/linux-${_major}.tar
         choose-gcc-optimization.sh
         'sphinx-workaround.patch'
         '0002-UKSM.patch'
+        'cjktty.patch'
         '0003-Makefile.patch')
 validpgpkeys=(
     'ABAF11C65A2970B130ABE3C479BE3E4300411886' # Linux Torvalds
@@ -104,11 +105,12 @@ done
 
 sha256sums=('04f07b54f0d40adfab02ee6cbd2a942c96728d87c1ef9e120d0cb9ba3fe067b4'
             'b8bc4f6312bdc086c0fecd1cce1ab1ee12b7b4eff63f88239a65461d9ec5e91b'
-            'f4bf0bf1df0f115498411184d4f5dde29597eeec2b772e2c0517a2423a04e9ef'
+            'b2d515812a4538ae7d7a0f6b10c0bda38828802172daef66b9ed0c79e6ee7e3e'
             'e840e41f0f91108f63fd6e085c93b02daa78729268bc31be7be7fb355203e38a'
             '74339b8ad0ad99f08606c5de0dd3c38f502e29e5c6a78d6efbe656662edb8d73'
             'f00a84fd382d63cd0d47d6fd8ef6c8608b1c83ff9d6dbdd32cb985898afbbf58'
-            'f17286cc6328a6230369ed4c60da2ca3286d9f6a86833141bfc252a27b2f57d8')
+            'e00c04d2969bd9e94849cbec44c6fc8ec7da7dad76b5e22f16b6701ad06a9707'
+            '59d69b01dd61e224c226f798efaa290b79822480d746c15b8bb3f66fec95ce5e')
 
 export KBUILD_BUILD_HOST=${KBUILD_BUILD_HOST:-archlinux}
 export KBUILD_BUILD_USER=${KBUILD_BUILD_USER:-makepkg}
