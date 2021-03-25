@@ -9326,7 +9326,7 @@ index c9fbdd848138..421c0105a7bc 100644
 +#endif
  #ifdef CONFIG_PRINTK
  static int ten_thousand = 10000;
- #endif
+ 
 @@ -184,7 +188,7 @@ static enum sysctl_writes_mode sysctl_writes_strict = SYSCTL_WRITES_STRICT;
  int sysctl_legacy_va_layout;
  #endif
