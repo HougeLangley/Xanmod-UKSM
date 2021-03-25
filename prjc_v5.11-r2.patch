@@ -9316,7 +9316,7 @@ diff --git a/kernel/sysctl.c b/kernel/sysctl.c
 index c9fbdd848138..421c0105a7bc 100644
 --- a/kernel/sysctl.c
 +++ b/kernel/sysctl.c
-@@ -120,10 +120,10 @@ static unsigned long long_max = LONG_MAX;
+@@ -120,9 +120,9 @@ static unsigned long long_max = LONG_MAX;
  static int one_hundred = 100;
  static int two_hundred = 200;
  static int one_thousand = 1000;
