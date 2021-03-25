@@ -69,10 +69,10 @@ _makenconfig=y
 ### IMPORTANT: Do no edit below this line unless you know what you're doing
 
 pkgbase=linux-xanmod-uksm
-pkgver=5.11.8
+pkgver=5.11.9
 _major=5.11
 _branch=5.x
-xanmod=2
+xanmod=1
 pkgrel=${xanmod}
 pkgdesc='Linux Xanmod. Branch with Cacule scheduler by Hamad Marri'
 url="http://www.xanmod.org/"
@@ -91,7 +91,8 @@ source=("https://cdn.kernel.org/pub/linux/kernel/v${_branch}/linux-${_major}.tar
         'sphinx-workaround.patch'
         '0002-UKSM.patch'
         'cjktty.patch'
-        '0003-Makefile.patch')
+#        '0003-Makefile.patch'
+        'prjc_v5.11-r2.patch')
 validpgpkeys=(
     'ABAF11C65A2970B130ABE3C479BE3E4300411886' # Linux Torvalds
     '647F28654894E3BD457199BE38DBBDC86092693E' # Greg Kroah-Hartman
@@ -105,12 +106,12 @@ done
 
 sha256sums=('04f07b54f0d40adfab02ee6cbd2a942c96728d87c1ef9e120d0cb9ba3fe067b4'
             'b8bc4f6312bdc086c0fecd1cce1ab1ee12b7b4eff63f88239a65461d9ec5e91b'
-            'da09a7132d9fd41237981aaea02556b4cda4a7e2dd102a0f52552039cde38d15'
+            'skiped'
             'e840e41f0f91108f63fd6e085c93b02daa78729268bc31be7be7fb355203e38a'
             '74339b8ad0ad99f08606c5de0dd3c38f502e29e5c6a78d6efbe656662edb8d73'
             'f00a84fd382d63cd0d47d6fd8ef6c8608b1c83ff9d6dbdd32cb985898afbbf58'
             'e00c04d2969bd9e94849cbec44c6fc8ec7da7dad76b5e22f16b6701ad06a9707'
-            'a74d067518b6047238e2bd4c95773b26d7d5f37aff870a83d88cacd3960d21cf')
+            'skiped')
 
 export KBUILD_BUILD_HOST=${KBUILD_BUILD_HOST:-archlinux}
 export KBUILD_BUILD_USER=${KBUILD_BUILD_USER:-makepkg}
