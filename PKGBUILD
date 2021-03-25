@@ -90,9 +90,7 @@ source=("https://cdn.kernel.org/pub/linux/kernel/v${_branch}/linux-${_major}.tar
         choose-gcc-optimization.sh
         'sphinx-workaround.patch'
         '0002-UKSM.patch'
-        'cjktty.patch'
-#        '0003-Makefile.patch'
-        'prjc_v5.11-r2.patch')
+        'cjktty.patch')
 validpgpkeys=(
     'ABAF11C65A2970B130ABE3C479BE3E4300411886' # Linux Torvalds
     '647F28654894E3BD457199BE38DBBDC86092693E' # Greg Kroah-Hartman
@@ -110,8 +108,7 @@ sha256sums=('04f07b54f0d40adfab02ee6cbd2a942c96728d87c1ef9e120d0cb9ba3fe067b4'
             'e840e41f0f91108f63fd6e085c93b02daa78729268bc31be7be7fb355203e38a'
             '74339b8ad0ad99f08606c5de0dd3c38f502e29e5c6a78d6efbe656662edb8d73'
             'f00a84fd382d63cd0d47d6fd8ef6c8608b1c83ff9d6dbdd32cb985898afbbf58'
-            'e00c04d2969bd9e94849cbec44c6fc8ec7da7dad76b5e22f16b6701ad06a9707'
-            'SKIP')
+            'e00c04d2969bd9e94849cbec44c6fc8ec7da7dad76b5e22f16b6701ad06a9707')
 
 export KBUILD_BUILD_HOST=${KBUILD_BUILD_HOST:-archlinux}
 export KBUILD_BUILD_USER=${KBUILD_BUILD_USER:-makepkg}
