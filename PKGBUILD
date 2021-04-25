@@ -69,7 +69,7 @@ _makenconfig=y
 ### IMPORTANT: Do no edit below this line unless you know what you're doing
 
 pkgbase=linux-xanmod-uksm
-pkgver=5.11.11
+pkgver=5.11.16
 _major=5.11
 _branch=5.x
 xanmod=1
@@ -86,7 +86,7 @@ options=('!strip')
 _srcname="linux-${pkgver}-xanmod${xanmod}"
 
 source=("https://cdn.kernel.org/pub/linux/kernel/v${_branch}/linux-${_major}.tar."{xz,sign}
-        "https://github.com/HougeLangley/Xanmod-UKSM/releases/download/Fix/patch-5.11.11-xanmod1"
+        "https://github.com/HougeLangley/customkernel/releases/download/Kernel-v5.11.x/patch-5.11.16-xanmod1"
         choose-gcc-optimization.sh
         'sphinx-workaround.patch'
         '0002-UKSM.patch'
@@ -107,8 +107,8 @@ sha256sums=('04f07b54f0d40adfab02ee6cbd2a942c96728d87c1ef9e120d0cb9ba3fe067b4'
             'SKIP'
             'e840e41f0f91108f63fd6e085c93b02daa78729268bc31be7be7fb355203e38a'
             '74339b8ad0ad99f08606c5de0dd3c38f502e29e5c6a78d6efbe656662edb8d73'
-            'f00a84fd382d63cd0d47d6fd8ef6c8608b1c83ff9d6dbdd32cb985898afbbf58'
-            'e00c04d2969bd9e94849cbec44c6fc8ec7da7dad76b5e22f16b6701ad06a9707')
+            'SKIP'
+            'SKIP')
 
 export KBUILD_BUILD_HOST=${KBUILD_BUILD_HOST:-archlinux}
 export KBUILD_BUILD_USER=${KBUILD_BUILD_USER:-makepkg}
