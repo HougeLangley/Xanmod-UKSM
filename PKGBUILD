@@ -131,41 +131,7 @@ prepare() {
     patch -Np1 < "../$src"
   done
 
-  # CONFIG_STACK_VALIDATION gives better stack traces. Also is enabled in all official kernel packages by Archlinux team
-  scripts/config --enable CONFIG_STACK_VALIDATION
-
-  # Enable IKCONFIG following Arch's philosophy
-  scripts/config --enable CONFIG_IKCONFIG \
-                 --enable CONFIG_IKCONFIG_PROC
-
-  # User set. See at the top of this file
-  if [ "$use_tracers" = "n" ]; then
-    msg2 "Disabling FUNCTION_TRACER/GRAPH_TRACER..."
-    scripts/config --disable CONFIG_FUNCTION_TRACER \
-                   --disable CONFIG_STACK_TRACER
-  fi
-
-  if [ "$use_numa" = "n" ]; then
-    msg2 "Disabling NUMA..."
-    scripts/config --disable CONFIG_NUMA
-  fi
-
-  #if [ "$use_ns" = "n" ]; then
-  #  msg2 "Disabling CONFIG_USER_NS_UNPRIVILEGED"
-  #  scripts/config --disable CONFIG_USER_NS_UNPRIVILEGED
-  #fi
-
-  # Let's user choose microarchitecture optimization in GCC
-  # sh ${srcdir}/choose-gcc-optimization.sh $_microarchitecture
-
-  # This is intended for the people that want to build this package with their own config
-  # Put the file "myconfig" at the package folder to use this feature
-  # If it's a full config, will be replaced
-  # If not, you should use scripts/config commands, one by line
-  ### Optionally load needed modules for the make localmodconfig
-  # See https://aur.archlinux.org/packages/modprobed-db
-  
-  cp /src/linux-5.12/CONFIGS/xanmod/gcc/config /src/linux-5.12/.config
+  cp CONFIGS/xanmod/gcc/config .config
   make menuconfig
 
   make -s kernelrelease > version
