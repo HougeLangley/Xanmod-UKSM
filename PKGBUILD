@@ -165,7 +165,7 @@ prepare() {
   ### Optionally load needed modules for the make localmodconfig
   # See https://aur.archlinux.org/packages/modprobed-db
   
-  rm .config.old
+  cp $src/CONFIGS/xanmod/gcc/config $src/.config
   make menuconfig
 
   make -s kernelrelease > version
