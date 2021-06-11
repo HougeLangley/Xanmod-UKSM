@@ -1,72 +1,5 @@
 # Maintainer: 苏业钦 <hougelangley1987@gmail.com>
-# Contributor: Torge Matthies <openglfreak at googlemail dot com>
-# Contributor: Jan Alexander Steffens (heftig) <jan.steffens@gmail.com>
-# Contributor: Yoshi2889 <rick.2889 at gmail dot com>
-# Contributor: Tobias Powalowski <tpowa@archlinux.org>
-# Contributor: Thomas Baechler <thomas@archlinux.org>
-# Contributor: Joan Figueras <ffigue at gmail dot com>
-
-##
-## The following variables can be customized at build time. Use env or export to change at your wish
-##
-##   Example: env _microarchitecture=25 use_numa=n use_tracers=n use_pds=n makepkg -sc
-##
-## Look inside 'choose-gcc-optimization.sh' to choose your microarchitecture
-## Valid numbers between: 0 to 42
-## Default is: 0 => generic
-## Good option if your package is for one machine: 42 => native
-## 我个人的恶趣味，就是选择 native，自动优化，当然各位根据自己的实际情况做出选择也是可以的
-#if [ -z ${_microarchitecture+x} ]; then
-#  _microarchitecture=99
-#fi
-
-## Disable NUMA since most users do not have multiple processors. Breaks CUDA/NvEnc.
-## Archlinux and Xanmod enable it by default.
-## Set variable "use_numa" to: n to disable (possibly increase performance)
-##                             y to enable  (stock default)
-## 这里保持默认就好，我没有发现有什么独特的地方
-if [ -z ${use_numa+x} ]; then
-  use_numa=n
-fi
-
-## For performance you can disable FUNCTION_TRACER/GRAPH_TRACER. Limits debugging and analyzing of the kernel.
-## Stock Archlinux and Xanmod have this enabled. 
-## Set variable "use_tracers" to: n to disable (possibly increase performance)
-##                                y to enable  (stock default)
-## 我觉得默认关掉会好些，个人观点
-if [ -z ${use_tracers+x} ]; then
-  use_tracers=n
-fi
-
-## Enable CONFIG_USER_NS_UNPRIVILEGED flag https://aur.archlinux.org/cgit/aur.git/tree/0001-ZEN-Add-sysctl-and-CONFIG-to-disallow-unprivileged-C.patch?h=linux-ck
-## Set variable "use_ns" to: n to disable (stock Xanmod)
-##                           y to enable (stock Archlinux)
-## By the way, This is important for people who using Skype and Wechat UOS, if 'NO', these apps could using.
-## 如果你使用 skype 或者 wechatUOS，请选择这个补丁
-## 否则，软件无法启动
-#if [ -z ${use_ns+x} ]; then
-#  use_ns=y
-#fi
-
-# Compile ONLY used modules to VASTLYreduce the number of modules built
-# and the build time.
-#
-# To keep track of which modules are needed for your specific system/hardware,
-# give module_db script a try: https://aur.archlinux.org/packages/modprobed-db
-# This PKGBUILD read the database kept if it exists
-#
-# More at this wiki page ---> https://wiki.archlinux.org/index.php/Modprobed-db
-# 不知道大家是否了解 module_db 它类似会检测你的系统平时经常用的模块，这样将来可以给出建议到 .config
-# 编译极简化的内核。
-if [ -z ${_localmodcfg} ]; then
-  _localmodcfg=n
-fi
-
-# Tweak kernel options prior to a build via nconfig
-# 我觉得还是选上，这样给大家微调的空间
-_makenconfig=y
-
-### IMPORTANT: Do no edit below this line unless you know what you're doing
+## Just For GCC ##
 
 pkgbase=linux-xanmod-uksm
 pkgver=5.12.10
@@ -255,5 +188,3 @@ for _p in "${pkgname[@]}"; do
     _package${_p#$pkgbase}
   }"
 done
-
-# vim:set ts=8 sts=2 sw=2 et:
