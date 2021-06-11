@@ -164,6 +164,9 @@ prepare() {
   # If not, you should use scripts/config commands, one by line
   ### Optionally load needed modules for the make localmodconfig
   # See https://aur.archlinux.org/packages/modprobed-db
+
+  make config
+
   make -s kernelrelease > version
   msg2 "Prepared %s version %s" "$pkgbase" "$(<version)"
 
