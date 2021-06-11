@@ -165,12 +165,12 @@ prepare() {
   ### Optionally load needed modules for the make localmodconfig
   # See https://aur.archlinux.org/packages/modprobed-db
 
-  make config
+  make menuconfig
 
   make -s kernelrelease > version
   msg2 "Prepared %s version %s" "$pkgbase" "$(<version)"
 
-  [[ -z "$_makenconfig" ]] || make nconfig
+  ##[[ -z "$_makenconfig" ]] || make nconfig
 
   # save configuration for later reuse
   cat .config > "${startdir}/config.last"
