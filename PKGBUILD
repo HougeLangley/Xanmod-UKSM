@@ -164,7 +164,8 @@ prepare() {
   # If not, you should use scripts/config commands, one by line
   ### Optionally load needed modules for the make localmodconfig
   # See https://aur.archlinux.org/packages/modprobed-db
-
+  
+  rm .config.old
   make menuconfig
 
   make -s kernelrelease > version
